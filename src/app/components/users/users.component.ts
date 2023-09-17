@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Pagable } from 'src/app/model/pageable.model';
 import { UsersService } from 'src/app/services/users.service';
 
 @Component({
@@ -9,16 +11,34 @@ import { UsersService } from 'src/app/services/users.service';
 export class UsersComponent implements OnInit {
 
   public usersList:any[] =[];
+  public pagable:Pagable= { page:0, size:5, sort:'userId', sortOrder:'DESC' };
+  public userInfo:any;
 
-  constructor(private userService: UsersService) { }
+  constructor(private userService: UsersService, private modalService: NgbModal) { }
 
   ngOnInit(): void {
-
-    this.userService.getAll().subscribe((response:any ) => {
-      this.usersList = response;
-      // console.log(response);
-    });
-
+    this.getAllUser();
   }
 
+  public getAllUser() {
+    this.userService.getAll(this.pagable).subscribe((response:any ) => {
+      this.usersList = response.content;
+      // console.log(response);
+    });
+  }
+  public openModal(model:any, userInfo?:any) {
+    this.modalService.open(model, { size: "l" });
+    this.userInfo = userInfo;
+  }
+
+  public closeModel(modelRef:any) {
+    this.modalService.dismissAll(modelRef);
+  }
+
+  deleteUser(userId:any) {
+    this.userService.delete(userId).subscribe((response:any ) => {
+      this.getAllUser();
+    });
+  }
+  
 }
