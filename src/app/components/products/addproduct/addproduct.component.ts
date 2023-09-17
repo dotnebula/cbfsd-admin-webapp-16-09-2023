@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Pagable } from 'src/app/model/pageable.model';
 import { CategoriesService } from 'src/app/services/catergories.service';
+import { ProductsService } from 'src/app/services/products.service';
 
 @Component({
   selector: 'app-addproduct',
@@ -18,19 +20,24 @@ export class AddproductComponent implements OnInit {
   updation: boolean = false;
   loader: boolean = false;
   categoryList:any[] =[];
+  public pagable:Pagable= { page:0, size:50, sort:'categoryId', sortOrder:'DESC' };
+
 
   @Input()
   public productInfo:any;
 
   @Output()
   public closeModel: EventEmitter<void> = new EventEmitter<void>();
+  errResponse: string="";
 
-  constructor(private modalService: NgbModal,  private fb:FormBuilder,private categoriesService:CategoriesService) { }
+  constructor(private modalService: NgbModal,  private fb:FormBuilder,private categoriesService:CategoriesService,
+    private productService:ProductsService) { }
 
   ngOnInit(): void {
-    this.categoriesService.getAll().subscribe( (response:any)=> {
-      this.categoryList = response;
-    })
+
+    this.categoriesService.getAll(this.pagable).subscribe( (response:any)=> {
+      this.categoryList = response.content;
+    });
 
     if(this.productInfo) {
       this.initialiseProductModal(this.productInfo);
@@ -50,8 +57,9 @@ export class AddproductComponent implements OnInit {
         thumbnailImage: [null],
         productDescription: [null],
         productCategory: [null],
+        productCode: [null],
         active: [true],
-        addedOn: [],
+        addedOn: [new Date()],
         rating: [0]
       });
     } else {
@@ -64,6 +72,7 @@ export class AddproductComponent implements OnInit {
         thumbnailImage: [productObj.thumbnailImage],
         productDescription: [productObj.productDescription],
         productCategory: [productObj.productCategory],
+        productCode: [productObj.productCode],
         active: [productObj.active],
         addedOn: [productObj.addedOn],
         rating: [productObj.rating]
@@ -115,6 +124,40 @@ export class AddproductComponent implements OnInit {
 
   compareByCategoryId(category1: Category, category2: Category) {
     return category1 && category2 && category1.categoryId === category2.categoryId;
+  }
+
+  onSubmit() {
+    if(this.productForm.valid) {
+      if(this.productForm.get('productId')?.value) {
+        this.handleUpdate();
+      } else{
+        this.handleCreate();
+      }
+    } else{
+      this.errResponse = "Enable to submit form, Invalid form data";
+      console.log("Invalid Form");
+    }
+  }
+
+  handleCreate() {
+    this.productService.add(this.productForm.getRawValue()).subscribe((response:any)=>{
+      // console.log(response);
+      // this.router.navigateByUrl('/users');
+      window.location.href ="/products";
+      this.close();
+      },error =>{
+        this.errResponse = error.error.message;
+      })
+  }
+
+  handleUpdate() {
+    this.productService.update(this.productForm.getRawValue()).subscribe((response:any)=>{
+      // console.log(response);
+      window.location.href ="/products";
+        this.close();
+      },error =>{
+        this.errResponse = error.error.message;
+      })
   }
 }
 
