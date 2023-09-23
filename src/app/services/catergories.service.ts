@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Pagable } from '../model/pageable.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoriesService {
 
-  private CATG_URL ="http://localhost:8088/ecomorg-webservice/api/categories";
+  private CATG_URL =`${environment.apiBaseUrl}/categories`;
 
   constructor(private httpClient: HttpClient) { }
 

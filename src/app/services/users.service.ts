@@ -1,13 +1,14 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Pagable } from "../model/pageable.model";
+import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn : 'root'
 })
 export class UsersService {
 
-    private USER_URL ="http://localhost:8088/ecomorg-webservice/api/users";
+    private USER_URL =`${environment.apiBaseUrl}/users`;
 
     constructor(private httpClient: HttpClient) { }
 
