@@ -23,16 +23,21 @@ pipeline {
         stage('Docker build') {
             steps {
                 echo 'Build dokcer image'
-                bat ''' docker image build -t cbfsd-admin-webapp-12-11-2022 .'''
+                sh ''' docker image build -t cbfsd-admin-webapp .'''
             }
         }
 
         stage('Docker deploy') {
             steps {
                 echo '----------------- This is a docker deploment phase ----------'
-                bat '''
-                
-                docker container run --restart always --name cbfsd-admin-webapp-container-12-11-2022 -p 4200:80 -d cbfsd-admin-webapp-12-11-2022
+                sh '''
+                (if  [ $(docker ps -a | grep cbfsd-admin-webapp-container | cut -d " " -f1) ]; then \
+                        echo $(docker rm -f cbfsd-admin-webapp-container); \
+                        echo "---------------- successfully removed cbfsd-admin-webapp-container ----------------"
+                     else \
+                    echo OK; \
+                 fi;);
+                docker container run --restart always --name cbfsd-admin-webapp-container -p 4200:80 -d cbfsd-admin-webapp
             '''
             }
         }
