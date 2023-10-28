@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CategoriesService } from 'src/app/services/catergories.service';
 
 @Component({
   selector: 'app-addcategory',
@@ -19,8 +20,9 @@ export class AddcategoryComponent implements OnInit {
 
   @Output()
   public closeModel: EventEmitter<void> = new EventEmitter<void>();
+  public errResponse: string ="";
 
-  constructor( private modalService: NgbModal,  private fb:FormBuilder) { }
+  constructor( private modalService: NgbModal,  private fb:FormBuilder, private categoryService: CategoriesService) { }
 
   ngOnInit(): void {
     if(this.categoryInfo) {
@@ -36,7 +38,7 @@ export class AddcategoryComponent implements OnInit {
       this.productCategoryForm = this.fb.group({
         categoryName: ["", Validators.required],
         categoryDescription: ["", Validators.required],
-        categoryImageUrl: ["", Validators.required],
+        categoryImageUrl: [""],
         categoryId: [null],
         active: [true],
         addedOn: [],
@@ -45,11 +47,45 @@ export class AddcategoryComponent implements OnInit {
       this.productCategoryForm = this.fb.group({
         categoryName: [productCategoryObj.categoryName, Validators.required],
         categoryDescription: [productCategoryObj.categoryDescription, Validators.required],
-        categoryImageUrl: [productCategoryObj.categoryImageUrl, Validators.required],
+        categoryImageUrl: [productCategoryObj.categoryImageUrl],
         categoryId: [productCategoryObj.categoryId],
         active: [productCategoryObj.active],
       });
     }
+  }
+
+  onSubmit() {
+    if(this.productCategoryForm.valid) {
+      if(this.productCategoryForm.get('categoryId')?.value) {
+        this.handleUpdate();
+      } else{
+        this.handleCreate();
+      }
+    } else{
+      this.errResponse = "Enable to submit form, Invalid form data";
+      console.log("Invalid Form");
+    }
+  }
+
+  handleCreate() {
+    this.categoryService.add(this.productCategoryForm.getRawValue()).subscribe((response:any)=>{
+      // console.log(response);
+      // this.router.navigateByUrl('/users');
+      window.location.href ="/products/categories";
+      this.close();
+      },error =>{
+        this.errResponse = error.error.message;
+      })
+  }
+
+  handleUpdate() {
+    this.categoryService.update(this.productCategoryForm.getRawValue()).subscribe((response:any)=>{
+      // console.log(response);
+      window.location.href ="/products/categories";
+        this.close();
+      },error =>{
+        this.errResponse = error.error.message;
+      })
   }
 
   checkFileType(event: any) {

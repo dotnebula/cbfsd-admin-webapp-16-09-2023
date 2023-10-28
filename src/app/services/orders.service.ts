@@ -8,11 +8,13 @@ export class OrdersService {
 
   constructor(private httpClient: HttpClient) { }
 
+  private ODR_URL ="http://localhost:8088/ecomorg-webservice/api/orders";
+
   getAll() {
-    return this.httpClient.get<any[]>('../../assets/json/orders.json');
+    return this.httpClient.get<any[]>(`${this.ODR_URL}`);
   }
 
   getOne(id:number) {
-    return this.httpClient.get<any[]>('../../assets/json/orders.json');
+    return this.httpClient.get<any[]>(`${this.ODR_URL}/${id}`);
   }
 }

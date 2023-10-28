@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UsersService } from 'src/app/services/users.service';
 
 @Component({
   selector: 'app-viewuser',
@@ -7,9 +10,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ViewuserComponent implements OnInit {
 
-  constructor() { }
+ 
+  @Input()
+  public userInfo:any;
+
+  @Output()
+  public closeModel: EventEmitter<void> = new EventEmitter<void>();
+
+  constructor(private modalService: NgbModal,  private userService:UsersService) { }
 
   ngOnInit(): void {
   }
 
+  close() {
+    this.closeModel.emit();
+  }
 }

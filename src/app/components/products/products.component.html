@@ -34,15 +34,15 @@
                             <tr *ngFor="let prod of productList; index as idx">
                                 <td>{{ idx + 1 }}</td>
                                 <td>{{ prod["productCode"] }}</td>
-                                <td class="text-wrap">{{ prod["productTitle"] }}</td>
-                                <td class="text-wrap">{{ prod["productDescription"] }}</td>
-                                <td>{{ prod["productCategory"]["categoryName"] }}</td>
-                                <td>{{ prod["price"] | currency:'USD':'symbol':'1.0' }}</td>
+                                <td class="text-wrap">{{ prod?.productTitle}}</td>
+                                <td class="text-wrap">{{ prod?.productDescription }}</td>
+                                <td>{{ prod?.productCategory?.categoryName }}</td>
+                                <td>{{ prod?.price| currency:'USD':'symbol':'1.0' }}</td>
                                 <td>
                                   <button type="button" class="btn btn-sm btn-dark me-1" (click)="openImageModal(viewImageModal, prod.images, prod.thumbnailImage)" >View Images</button>
                                   <button type="button" class="btn btn-sm btn-dark me-1" (click)="openViewModal(productViewModal, prod)" >View Details</button>
                                   <button type="button" class="btn btn-sm btn-dark me-1" (click)="openModal(productModal, prod)" >Update</button>
-                                  <button type="button" class="btn btn-sm btn-danger me-1">Delete</button>
+                                  <button type="button" class="btn btn-sm btn-danger me-1" (click)="delete(prod?.productId)" >Delete</button>
                                   
                                 </td>
                               </tr>                       

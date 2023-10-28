@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Pagable } from 'src/app/model/pageable.model';
 import { ProductsService } from 'src/app/services/products.service';
 
 @Component({
@@ -15,13 +16,18 @@ export class ProductsComponent implements OnInit {
   public selectedImageIdx: number = 0;
   public thumbnailImageIdx: number = 0;
   public tempImageFiles: any[] = [];
+  public pagable:Pagable= { page:0, size:10, sort:'productId', sortOrder:'DESC' };
 
   constructor(private productsService:ProductsService,private modalService: NgbModal) { }
 
   ngOnInit(): void {
-    this.productsService.getAll().subscribe((response:any)=> {
-      // console.log(response);
-      this.productList = response;
+    this.getAllProduct();
+  }
+
+  getAllProduct() {
+    this.productsService.getAll(this.pagable).subscribe((response:any)=> {
+      console.log(response);
+      this.productList = response.content;
     })
   }
 
@@ -50,7 +56,11 @@ export class ProductsComponent implements OnInit {
       window.open(url, "_blank")
   }
 
-    
+  delete(productId:any) {
+    this.productsService.delete(productId).subscribe(response=>{
+      this.getAllProduct();
+    })
+  } 
   closeModel(modelRef:any) {
     this.modalService.dismissAll(modelRef);
   }
